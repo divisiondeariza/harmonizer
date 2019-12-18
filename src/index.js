@@ -5,6 +5,38 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
 
+class ChordInput extends React.Component {
+
+  render(){
+    const checkChord = () => {
+      const input = ReactDOM.findDOMNode(this);
+      const chord = input.value;
+
+      if (isGood(chord)) {
+        input.style.color = 'black';
+      } else {
+        input.style.color = 'red';
+      }
+    }
+
+    const isGood = (chord) => {
+      if (!chord) {
+        return false;
+      }
+      try {
+        mm.chords.ChordSymbols.pitches(chord);
+        return true;
+      }
+      catch(e) {
+        return false;
+      }
+    }
+
+    return  <input type='text' value={this.props.value} onInput = {checkChord}/>
+  }
+
+}
+
 class Improviser extends React.Component {
 
   render(){
@@ -86,7 +118,6 @@ class Improviser extends React.Component {
           // Play it!
           player.start(seq, 120).then(() => {
             playing = false;
-            document.getElementById('message').innerText = 'Change chords and play again!';
             checkChords();
           });
         })
@@ -148,7 +179,6 @@ class Improviser extends React.Component {
         if (chords[3] !== currentChords[3]) {changed = true;}
       }
       else {changed = true;}
-      document.getElementById('play').disabled = !allGood || (!changed && playing);
     }
 
     // Initialize model then start playing.
@@ -194,6 +224,7 @@ class Improviser extends React.Component {
                            <td><input id='chord2' type='text' value='G' onInput = {checkChords}/></td>
                            <td><input id='chord3' type='text' value='Am' onInput = {checkChords}/></td>
                            <td><input id='chord4' type='text' value='F' onInput = {checkChords}/></td>
+                           <td><ChordInput value='G#'/></td>
                          </tr></table>
                        </div>
                        <br/>
