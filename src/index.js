@@ -12,11 +12,12 @@ class Improviser extends React.Component {
   render(){
 
     // Number of steps to play each chord.
-    const STEPS_PER_CHORD = 8;
-    const STEPS_PER_PROG = 4 * STEPS_PER_CHORD;
+
+    const STEPS_PER_CHORD = 16;
+    //const STEPS_PER_PROG = 4 * STEPS_PER_CHORD;
 
     // Number of times to repeat chord progression.
-    const NUM_REPS = 4;
+    const NUM_REPS = 1;
     const model = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
     const init_model = async ({model}) => {
       return await model.initialize();
@@ -27,20 +28,25 @@ class Improviser extends React.Component {
 
     // Current chords being played.
     var currentChords = undefined;
+    var seq;
+
     // Sample over chord progression.
-    const playOnce = () => {
+    const generate = () => {
+      console.log("generating");
+      currentChords = [...ReactDOM.findDOMNode(this).querySelector('table').querySelectorAll('input')].map(e=>e.value);
       const chords = currentChords;
+      const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
 
       // Prime with root note of the first chord.
-      const seq = {
+      seq = {
         quantizationInfo: {stepsPerQuarter: 4},
         notes: [],
         totalQuantizedSteps: 1
       };
 
-      //document.getElementById('message').innerText = 'Improvising over: ' + chords;
-      model.continueSequence(seq, STEPS_PER_PROG + (NUM_REPS-1)*STEPS_PER_PROG - 1, 0.9, chords)
+      model.continueSequence(seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
         .then((contSeq) => {
+
           // Add the continuation to the original.
           contSeq.notes.forEach((note) => {
             note.quantizedStartStep += 1;
@@ -51,51 +57,35 @@ class Improviser extends React.Component {
           const roots = chords.map(mm.chords.ChordSymbols.root);
           for (var i=0; i<NUM_REPS; i++) {
             // Add the bass progression.
-            seq.notes.push({
-              instrument: 1,
-              program: 32,
-              pitch: 36 + roots[0],
-              quantizedStartStep: i*STEPS_PER_PROG,
-              quantizedEndStep: i*STEPS_PER_PROG + STEPS_PER_CHORD
-            });
-            seq.notes.push({
-              instrument: 1,
-              program: 32,
-              pitch: 36 + roots[1],
-              quantizedStartStep: i*STEPS_PER_PROG + STEPS_PER_CHORD,
-              quantizedEndStep: i*STEPS_PER_PROG + 2*STEPS_PER_CHORD
-            });
-            seq.notes.push({
-              instrument: 1,
-              program: 32,
-              pitch: 36 + roots[2],
-              quantizedStartStep: i*STEPS_PER_PROG + 2*STEPS_PER_CHORD,
-              quantizedEndStep: i*STEPS_PER_PROG + 3*STEPS_PER_CHORD
-            });
-            seq.notes.push({
-              instrument: 1,
-              program: 32,
-              pitch: 36 + roots[3],
-              quantizedStartStep: i*STEPS_PER_PROG + 3*STEPS_PER_CHORD,
-              quantizedEndStep: i*STEPS_PER_PROG + 4*STEPS_PER_CHORD
-            });
+            for (var j=0; j<chords.length; j++){
+              seq.notes.push({
+                instrument: 1,
+                program: 32,
+                pitch: 36 + roots[j],
+                quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
+                quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
+              });
+            }
           }
 
           // Set total sequence length.
           seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
 
-          // Play it!
-          player.start(seq, 120).then(() => {
-            playing = false;
-            //checkChords();
-          });
         })
+        console.log("done");
+    }
+
+    const playOnce = () => {
+      if(seq){
+        player.start(seq, 120).then(() => {
+          playing = false;
+        });
+      }
     }
 
     const play = () => {
       playing = true;
       document.getElementById('play').disabled = true;
-      currentChords = [...ReactDOM.findDOMNode(this).querySelector('table').querySelectorAll('input')].map(e=>e.value);
       console.log(currentChords);
       mm.Player.tone.context.resume();
       player.stop();
@@ -115,15 +105,24 @@ class Improviser extends React.Component {
                          <table>
                           <tbody>
                              <tr>
-                               <td><ChordInput value='C'/></td>
-                               <td><ChordInput value='G'/></td>
-                               <td><ChordInput value='Am'/></td>
-                               <td><ChordInput value='F'/></td>
+                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='E7'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='A'/></td>
                              </tr>
                           </tbody>
                          </table>
                        </div>
                        <br/>
+                       <input id='play' type='button' value='Generate' onClick = {generate}/>
                        <input id='play' type='button' value='Play' onClick = {play}/>
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
