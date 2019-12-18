@@ -32,10 +32,10 @@ class ChordInput extends React.Component {
       }
     }
 
-    return  <input type='text' value={this.props.value} onInput = {checkChord}/>
+    return  <input type='text' defaultValue={this.props.value} onChange = {checkChord}/>
   }
-
 }
+
 
 class Improviser extends React.Component {
 
@@ -118,7 +118,7 @@ class Improviser extends React.Component {
           // Play it!
           player.start(seq, 120).then(() => {
             playing = false;
-            checkChords();
+            //checkChords();
           });
         })
     }
@@ -192,13 +192,14 @@ class Improviser extends React.Component {
     const play = () => {
       playing = true;
       document.getElementById('play').disabled = true;
-      currentChords = [
-        document.getElementById('chord1').value,
-        document.getElementById('chord2').value,
-        document.getElementById('chord3').value,
-        document.getElementById('chord4').value
-      ];
-
+      currentChords = [...ReactDOM.findDOMNode(this).querySelector('table').querySelectorAll('input')].map(e=>e.value);
+      // currentChords = [
+      //   document.getElementById('chord1').value,
+      //   document.getElementById('chord2').value,
+      //   document.getElementById('chord3').value,
+      //   document.getElementById('chord4').value
+      // ];
+      console.log(currentChords);
       mm.Player.tone.context.resume();
       player.stop();
       playOnce();
@@ -219,13 +220,16 @@ class Improviser extends React.Component {
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
                        <div id='chords'>
-                         <table><tr>
-                           <td><input id='chord1' type='text' value='C' onInput = {checkChords}/></td>
-                           <td><input id='chord2' type='text' value='G' onInput = {checkChords}/></td>
-                           <td><input id='chord3' type='text' value='Am' onInput = {checkChords}/></td>
-                           <td><input id='chord4' type='text' value='F' onInput = {checkChords}/></td>
-                           <td><ChordInput value='G#'/></td>
-                         </tr></table>
+                         <table>
+                          <tbody>
+                             <tr>
+                               <td><ChordInput value='C'/></td>
+                               <td><ChordInput value='G'/></td>
+                               <td><ChordInput value='Am'/></td>
+                               <td><ChordInput value='F'/></td>
+                             </tr>
+                          </tbody>
+                         </table>
                        </div>
                        <br/>
                        <input id='play' type='button' value='Play' onClick = {play}/>
