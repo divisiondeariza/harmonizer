@@ -4,37 +4,7 @@ import * as mm from '@magenta/music';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
-
-class ChordInput extends React.Component {
-
-  render(){
-    const checkChord = () => {
-      const input = ReactDOM.findDOMNode(this);
-      const chord = input.value;
-
-      if (isGood(chord)) {
-        input.style.color = 'black';
-      } else {
-        input.style.color = 'red';
-      }
-    }
-
-    const isGood = (chord) => {
-      if (!chord) {
-        return false;
-      }
-      try {
-        mm.chords.ChordSymbols.pitches(chord);
-        return true;
-      }
-      catch(e) {
-        return false;
-      }
-    }
-
-    return  <input type='text' defaultValue={this.props.value} onChange = {checkChord}/>
-  }
-}
+import ChordInput from "./ChordInput"
 
 
 class Improviser extends React.Component {
@@ -53,7 +23,7 @@ class Improviser extends React.Component {
     }
 
     const player = new mm.Player();
-    var playing = false;
+    var playing;
 
     // Current chords being played.
     var currentChords = undefined;
@@ -62,7 +32,6 @@ class Improviser extends React.Component {
       const chords = currentChords;
 
       // Prime with root note of the first chord.
-      const root = mm.chords.ChordSymbols.root(chords[0]);
       const seq = {
         quantizationInfo: {stepsPerQuarter: 4},
         notes: [],
@@ -123,93 +92,16 @@ class Improviser extends React.Component {
         })
     }
 
-    // Check chords for validity and highlight invalid chords.
-    const checkChords = () => {
-      const chords = [
-        document.getElementById('chord1').value,
-        document.getElementById('chord2').value,
-        document.getElementById('chord3').value,
-        document.getElementById('chord4').value
-      ];
-
-      const isGood = (chord) => {
-        if (!chord) {
-          return false;
-        }
-        try {
-          mm.chords.ChordSymbols.pitches(chord);
-          return true;
-        }
-        catch(e) {
-          return false;
-        }
-      }
-
-      var allGood = true;
-      if (isGood(chords[0])) {
-        document.getElementById('chord1').style.color = 'black';
-      } else {
-        document.getElementById('chord1').style.color = 'red';
-        allGood = false;
-      }
-      if (isGood(chords[1])) {
-        document.getElementById('chord2').style.color = 'black';
-      } else {
-        document.getElementById('chord2').style.color = 'red';
-        allGood = false;
-      }
-      if (isGood(chords[2])) {
-        document.getElementById('chord3').style.color = 'black';
-      } else {
-        document.getElementById('chord3').style.color = 'red';
-        allGood = false;
-      }
-      if (isGood(chords[3])) {
-        document.getElementById('chord4').style.color = 'black';
-      } else {
-        document.getElementById('chord4').style.color = 'red';
-        allGood = false;
-      }
-
-      var changed = false;
-      if (currentChords) {
-        if (chords[0] !== currentChords[0]) {changed = true;}
-        if (chords[1] !== currentChords[1]) {changed = true;}
-        if (chords[2] !== currentChords[2]) {changed = true;}
-        if (chords[3] !== currentChords[3]) {changed = true;}
-      }
-      else {changed = true;}
-    }
-
-    // Initialize model then start playing.
-    // model.initialize().then(() => {
-    //   document.getElementById('message').innerText = 'Done loading model.'
-    //   document.getElementById('play').disabled = false;
-    // });
-
-    // Play when play button is clicked.
-    //document.getElementById('play').onclick
     const play = () => {
       playing = true;
       document.getElementById('play').disabled = true;
       currentChords = [...ReactDOM.findDOMNode(this).querySelector('table').querySelectorAll('input')].map(e=>e.value);
-      // currentChords = [
-      //   document.getElementById('chord1').value,
-      //   document.getElementById('chord2').value,
-      //   document.getElementById('chord3').value,
-      //   document.getElementById('chord4').value
-      // ];
       console.log(currentChords);
       mm.Player.tone.context.resume();
       player.stop();
       playOnce();
+      document.getElementById('play').disabled = false;
     }
-
-    // Check chords for validity when changed.
-    // document.getElementById('chord1').oninput = checkChords;
-    // document.getElementById('chord2').oninput = checkChords;
-    // document.getElementById('chord3').oninput = checkChords;
-    // document.getElementById('chord4').oninput = checkChords;
 
 
 
