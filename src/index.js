@@ -5,54 +5,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
-import ChordInput from "./ChordInput"
 import { saveAs } from 'file-saver';
-
-class Phrase extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {chords: []};
-  }
-
-  render(){
-    const addChord = () => {
-      this.setState({chords: [...this.state.chords, ""]});
-    }
-
-    const removeChord = () => {
-      this.setState({chords: this.state.chords.slice(0,-1)});
-    }
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='Cm'/></div>
-    // <div class="col-1"><ChordInput value='Gm'/></div>
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='F'/></div>
-    // <div class="col-1"><ChordInput value='F'/></div>
-    // <div class="col-1"><ChordInput value='F'/></div>
-    // <div class="col-1"><ChordInput value='F'/></div>
-    // <div class="col-1"><ChordInput value='Em'/></div>
-    // <div class="col-1"><ChordInput value='Em'/></div>
-    // <div class="col-1"><ChordInput value='Eb'/></div>
-    // <div class="col-1"><ChordInput value='Eb'/></div>
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='Gm'/></div>
-    // <div class="col-1"><ChordInput value='Gm'/></div>
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='D'/></div>
-    // <div class="col-1"><ChordInput value='Gm'/></div>
-    // <div class="col-1"><ChordInput value='F'/></div>
-    return <div className="row" id={this.props.id}>
-              {this.state.chords.map(chord => <div className="col-1 chord"><ChordInput value={chord}/></div>)}
-              <div className="col-1">
-                 <input  type='button' value='Add Chord' onClick = {addChord}/>
-               </div>
-               <div className="col-1">
-                  <input  type='button' value='Remove Chord' onClick = {removeChord}/>
-                </div>
-           </div>
-  }
-}
+import Phrase from "./Phrase"
 
 class Improviser extends React.Component {
   constructor(props) {
