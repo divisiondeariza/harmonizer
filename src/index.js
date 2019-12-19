@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as mm from '@magenta/music';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
@@ -14,7 +15,7 @@ class Improviser extends React.Component {
 
     // Number of steps to play each chord.
 
-    const STEPS_PER_CHORD = 4;
+    const STEPS_PER_CHORD = 8;
 
     // Number of times to repeat chord progression.
     const NUM_REPS = 1;
@@ -33,7 +34,7 @@ class Improviser extends React.Component {
     // Sample over chord progression.
     const generate = () => {
       console.log("generating");
-      currentChords = [...ReactDOM.findDOMNode(this).querySelector('table').querySelectorAll('input')].map(e=>e.value);
+      currentChords = [...ReactDOM.findDOMNode(this).querySelector('#chords').querySelectorAll('input')].map(e=>e.value);
       const chords = currentChords;
       const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
 
@@ -102,39 +103,33 @@ class Improviser extends React.Component {
     }
 
 
-    return   <div>Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
+    return   <div class="container">Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
              en la era de la tecnología digital a tal punto que lo único que tenés que
              hacer es poner el dedo y apretar un botón...
                      <Async promiseFn={init_model} model={model}>
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
-                       <div id='chords'>
-                         <table>
-                          <tbody>
-                             <tr>
-                               <td><ChordInput value='Gm'/></td>
-                               <td><ChordInput value='Cm'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='F'/></td>
-                               <td><ChordInput value='F'/></td>
-                               <td><ChordInput value='F'/></td>
-                               <td><ChordInput value='F'/></td>
-                               <td><ChordInput value='Em'/></td>
-                               <td><ChordInput value='Em'/></td>
-                               <td><ChordInput value='Eb'/></td>
-                               <td><ChordInput value='Eb'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='Gm'/></td>
-                               <td><ChordInput value='Gm'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='Gm'/></td>
-                               <td><ChordInput value='F'/></td>
-                             </tr>
-                          </tbody>
-                         </table>
+                       <div id='chords' class="row">
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='Cm'/></div>
+                               <div class="col-1"><ChordInput value='Gm'/></div>
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='F'/></div>
+                               <div class="col-1"><ChordInput value='F'/></div>
+                               <div class="col-1"><ChordInput value='F'/></div>
+                               <div class="col-1"><ChordInput value='F'/></div>
+                               <div class="col-1"><ChordInput value='Em'/></div>
+                               <div class="col-1"><ChordInput value='Em'/></div>
+                               <div class="col-1"><ChordInput value='Eb'/></div>
+                               <div class="col-1"><ChordInput value='Eb'/></div>
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='Gm'/></div>
+                               <div class="col-1"><ChordInput value='Gm'/></div>
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='D'/></div>
+                               <div class="col-1"><ChordInput value='Gm'/></div>
+                               <div class="col-1"><ChordInput value='F'/></div>
                        </div>
                        <br/>
                        <input id='play' type='button' value='Generate' onClick = {generate}/>
