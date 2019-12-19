@@ -17,7 +17,10 @@ class Phrase extends React.Component {
   render(){
     const addChord = () => {
       this.setState({chords: [...this.state.chords, ""]});
-      console.log(this.state.chords);
+    }
+
+    const removeChord = () => {
+      this.setState({chords: this.state.chords.slice(0,-1)});
     }
     // <div class="col-1"><ChordInput value='D'/></div>
     // <div class="col-1"><ChordInput value='Cm'/></div>
@@ -44,6 +47,9 @@ class Phrase extends React.Component {
               <div className="col-1">
                  <input  type='button' value='Add Chord' onClick = {addChord}/>
                </div>
+               <div className="col-1">
+                  <input  type='button' value='Remove Chord' onClick = {removeChord}/>
+                </div>
            </div>
   }
 }
@@ -77,7 +83,7 @@ class Improviser extends React.Component {
     // Sample over chord progression.
     const generate = () => {
       console.log("generating");
-      currentChords = [...ReactDOM.findDOMNode(this).querySelector('#chords').querySelectorAll('.chord >input')].map(e=>e.value);
+      currentChords = [...ReactDOM.findDOMNode(this).querySelector('#chords').querySelectorAll('.chord > input')].map(e=>e.value);
       console.log(currentChords);
       const chords = currentChords;
       const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
