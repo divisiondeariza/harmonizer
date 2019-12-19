@@ -5,6 +5,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
 import ChordInput from "./ChordInput"
+import { saveAs } from 'file-saver';
 
 
 class Improviser extends React.Component {
@@ -13,8 +14,7 @@ class Improviser extends React.Component {
 
     // Number of steps to play each chord.
 
-    const STEPS_PER_CHORD = 16;
-    //const STEPS_PER_PROG = 4 * STEPS_PER_CHORD;
+    const STEPS_PER_CHORD = 4;
 
     // Number of times to repeat chord progression.
     const NUM_REPS = 1;
@@ -93,6 +93,13 @@ class Improviser extends React.Component {
       document.getElementById('play').disabled = false;
     }
 
+    const download = () => {
+      if (!seq) {
+        alert('You must generate a trio before you can download it!');
+      } else {
+        saveAs(new File([mm.sequenceProtoToMidi(seq)], 'seq.mid'));
+      }
+    }
 
 
     return   <div>Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
@@ -105,18 +112,26 @@ class Improviser extends React.Component {
                          <table>
                           <tbody>
                              <tr>
-                               <td><ChordInput value='A'/></td>
-                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='Gm'/></td>
+                               <td><ChordInput value='Cm'/></td>
                                <td><ChordInput value='D'/></td>
                                <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='A'/></td>
-                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='F'/></td>
+                               <td><ChordInput value='F'/></td>
+                               <td><ChordInput value='F'/></td>
+                               <td><ChordInput value='F'/></td>
+                               <td><ChordInput value='Em'/></td>
+                               <td><ChordInput value='Em'/></td>
+                               <td><ChordInput value='Eb'/></td>
+                               <td><ChordInput value='Eb'/></td>
                                <td><ChordInput value='D'/></td>
                                <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='E7'/></td>
+                               <td><ChordInput value='Gm'/></td>
+                               <td><ChordInput value='Gm'/></td>
                                <td><ChordInput value='D'/></td>
-                               <td><ChordInput value='A'/></td>
-                               <td><ChordInput value='A'/></td>
+                               <td><ChordInput value='D'/></td>
+                               <td><ChordInput value='Gm'/></td>
+                               <td><ChordInput value='F'/></td>
                              </tr>
                           </tbody>
                          </table>
@@ -124,6 +139,7 @@ class Improviser extends React.Component {
                        <br/>
                        <input id='play' type='button' value='Generate' onClick = {generate}/>
                        <input id='play' type='button' value='Play' onClick = {play}/>
+                       <input id='play' type='button' value='Download' onClick = {download}/>
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
                      </Async>
