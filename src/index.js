@@ -10,6 +10,10 @@ import { saveAs } from 'file-saver';
 
 
 class Improviser extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {chords: []};
+  }
 
   render(){
 
@@ -86,12 +90,12 @@ class Improviser extends React.Component {
 
     const play = () => {
       playing = true;
-      document.getElementById('play').disabled = true;
+      //document.getElementById('play').disabled = true;
       console.log(currentChords);
       mm.Player.tone.context.resume();
       player.stop();
       playOnce();
-      document.getElementById('play').disabled = false;
+      //document.getElementById('play').disabled = false;
     }
 
     const download = () => {
@@ -103,38 +107,48 @@ class Improviser extends React.Component {
     }
 
 
-    return   <div class="container">Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
+    const addChord = () => {
+      this.setState({chords: [...this.state.chords, ""]});
+      console.log(this.state.chords);
+    }
+
+
+
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='Cm'/></div>
+    // <div class="col-1"><ChordInput value='Gm'/></div>
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='F'/></div>
+    // <div class="col-1"><ChordInput value='F'/></div>
+    // <div class="col-1"><ChordInput value='F'/></div>
+    // <div class="col-1"><ChordInput value='F'/></div>
+    // <div class="col-1"><ChordInput value='Em'/></div>
+    // <div class="col-1"><ChordInput value='Em'/></div>
+    // <div class="col-1"><ChordInput value='Eb'/></div>
+    // <div class="col-1"><ChordInput value='Eb'/></div>
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='Gm'/></div>
+    // <div class="col-1"><ChordInput value='Gm'/></div>
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='D'/></div>
+    // <div class="col-1"><ChordInput value='Gm'/></div>
+    // <div class="col-1"><ChordInput value='F'/></div>
+    return   <div className="container">Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
              en la era de la tecnología digital a tal punto que lo único que tenés que
              hacer es poner el dedo y apretar un botón...
                      <Async promiseFn={init_model} model={model}>
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
-                       <div id='chords' class="row">
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='Cm'/></div>
-                               <div class="col-1"><ChordInput value='Gm'/></div>
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='F'/></div>
-                               <div class="col-1"><ChordInput value='F'/></div>
-                               <div class="col-1"><ChordInput value='F'/></div>
-                               <div class="col-1"><ChordInput value='F'/></div>
-                               <div class="col-1"><ChordInput value='Em'/></div>
-                               <div class="col-1"><ChordInput value='Em'/></div>
-                               <div class="col-1"><ChordInput value='Eb'/></div>
-                               <div class="col-1"><ChordInput value='Eb'/></div>
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='Gm'/></div>
-                               <div class="col-1"><ChordInput value='Gm'/></div>
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='D'/></div>
-                               <div class="col-1"><ChordInput value='Gm'/></div>
-                               <div class="col-1"><ChordInput value='F'/></div>
+                       <div id='chords' className="row">
+                       {this.state.chords.map(chord => <div className="col-1"><ChordInput value={chord}/></div>)}
+
                        </div>
                        <br/>
-                       <input id='play' type='button' value='Generate' onClick = {generate}/>
-                       <input id='play' type='button' value='Play' onClick = {play}/>
-                       <input id='play' type='button' value='Download' onClick = {download}/>
+                       <input  type='button' value='Generate' onClick = {generate}/>
+                       <input  type='button' value='Play' onClick = {play}/>
+                       <input  type='button' value='Download' onClick = {download}/>
+                       <input  type='button' value='Add Chord' onClick = {addChord}/>
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
                      </Async>
