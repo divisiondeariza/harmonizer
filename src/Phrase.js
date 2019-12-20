@@ -11,21 +11,18 @@ class Phrase extends React.Component {
     const addChord = (index) => {
       var chords = this.state.chords;
       chords.splice(index, 0, {value: ""});
-      console.log(chords);
       this.setState({chords: chords});
     }
 
     const removeChord = (index) => {
       var chords = this.state.chords;
       chords.splice(index, 1);
-      console.log(chords);
       this.setState({chords: chords});
     }
 
     const onChordChange = (newChord, index) => {
       var chords = this.state.chords;
       chords.splice(index, 1, {value: newChord});
-      console.log(chords);
       this.setState({chords: chords});
     }
 
@@ -47,7 +44,6 @@ class Phrase extends React.Component {
               <div className="col-1">
                   {renderAddButton(0)}
               </div>
-
               {renderChords()}
            </div>
   }

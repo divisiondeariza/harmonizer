@@ -17,8 +17,10 @@ class Improviser extends React.Component {
   render(){
 
     // Number of steps to play each chord.
+    const STEPS_PER_QUARTER = 6;
+    const CHORDS_PER_BAR = 2;
+    const STEPS_PER_CHORD = STEPS_PER_QUARTER * 4 / CHORDS_PER_BAR;
 
-    const STEPS_PER_CHORD = 8;
 
     // Number of times to repeat chord progression.
     const NUM_REPS = 1;
@@ -27,7 +29,8 @@ class Improviser extends React.Component {
       return await model.initialize();
     }
 
-    const player = new mm.Player();
+    const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
+    const player = new mm.SoundFontPlayer(sfUrl);
     var playing;
 
     // Current chords being played.
@@ -44,7 +47,7 @@ class Improviser extends React.Component {
 
       // Prime with root note of the first chord.
       seq = {
-        quantizationInfo: {stepsPerQuarter: 4},
+        quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
         notes: [],
         totalQuantizedSteps: 1
       };
@@ -56,25 +59,42 @@ class Improviser extends React.Component {
           contSeq.notes.forEach((note) => {
             note.quantizedStartStep += 1;
             note.quantizedEndStep += 1;
+            note.instrument = 0;
             seq.notes.push(note);
           });
 
-          const roots = chords.map(mm.chords.ChordSymbols.root);
+
           for (var i=0; i<NUM_REPS; i++) {
-            // Add the bass progression.
-            for (var j=0; j<chords.length; j++){
+
+            chords.forEach((chord, j)=>{
+              // Add bass
+              const root = mm.chords.ChordSymbols.root(chord);
               seq.notes.push({
                 instrument: 1,
-                program: 32,
-                pitch: 36 + roots[j],
+                program: 0,
+                pitch: 36 + root,
                 quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
                 quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
               });
-            }
+
+              // Add Chords
+              mm.chords.ChordSymbols.pitches(chord).forEach((pitch, k)=>{
+                seq.notes.push({
+                  instrument: 2,
+                  program: 0,
+                  pitch: 48 + pitch,
+                  quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
+                  quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
+                });
+              })
+
+            })
+
           }
 
           // Set total sequence length.
           seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
+          console.log(seq);
 
         })
         console.log("done");
