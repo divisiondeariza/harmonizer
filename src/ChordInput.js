@@ -4,8 +4,22 @@ import { chords as mmChords } from '@magenta/music' ;
 
 
 class ChordInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: props.value};
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return (this.props.value !== nextProps.value);
+  }
 
   render(){
+    const handleChange = () =>{
+      checkChord();
+      var newChord = this.input.value
+      this.props.onChordChange(newChord);
+    }
+
     const checkChord = () => {
       const input = ReactDOM.findDOMNode(this);
       const chord = input.value;
@@ -30,7 +44,10 @@ class ChordInput extends React.Component {
       }
     }
 
-    return  <input type='text' defaultValue={this.props.value} onChange = {checkChord}/>
+    return  <input ref={(ref) => this.input = ref}
+                   type='text'
+                   value={this.props.value}
+                   onChange = {handleChange}/>
   }
 }
 
