@@ -8,8 +8,11 @@ class Phrase extends React.Component {
   }
 
   render(){
-    const addChord = () => {
-      this.setState({chords: [...this.state.chords, {value: ""}]});
+    const addChord = (index) => {
+      var chords = this.state.chords;
+      chords.splice(index, 0, {value: ""});
+      console.log(chords);
+      this.setState({chords: chords});
     }
 
     const removeChord = (index) => {
@@ -26,22 +29,26 @@ class Phrase extends React.Component {
       this.setState({chords: chords});
     }
 
-
-
     const renderChords = () => {
       return this.state.chords.map((chord, index) => {
         return <div key={index} className="col-1 chord">
                   <ChordInput value={chord.value} onChordChange={(newChordValue)=>onChordChange(newChordValue, index)}/>
+                  {renderAddButton(index + 1)}
                   <div onClick={()=>{removeChord(index)}}> - </div>
                </div>
       })
     }
 
+    const renderAddButton = (index) =>{
+        return <span onClick={()=>{addChord(index)}}> + </span>
+    }
+
     return <div className="row" id={this.props.id}>
-              {renderChords()}
               <div className="col-1">
-                 <input  type='button' value='Add Chord' onClick = {addChord}/>
-               </div>
+                  {renderAddButton(0)}
+              </div>
+
+              {renderChords()}
            </div>
   }
 }
