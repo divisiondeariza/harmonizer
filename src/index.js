@@ -7,11 +7,13 @@ import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
 import { saveAs } from 'file-saver';
 import Phrase from "./Phrase"
+import Button from 'react-bootstrap/Button';
 
 class Improviser extends React.Component {
   constructor(props) {
     super(props);
-    this.chords = []
+    this.chords = [];
+
   }
 
   render(){
@@ -20,7 +22,6 @@ class Improviser extends React.Component {
     const STEPS_PER_QUARTER = 6;
     const CHORDS_PER_BAR = 2;
     const STEPS_PER_CHORD = STEPS_PER_QUARTER * 4 / CHORDS_PER_BAR;
-
 
     // Number of times to repeat chord progression.
     const NUM_REPS = 1;
@@ -33,24 +34,22 @@ class Improviser extends React.Component {
     const player = new mm.SoundFontPlayer(sfUrl);
     var playing;
 
-    // Current chords being played.
-    var currentChords = undefined;
-    var seq;
+
 
     // Sample over chord progression.
     const generate = () => {
       console.log("generating");
+      this.seq = {
+                    quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
+                    notes: [],
+                    totalQuantizedSteps: 1
+                  };
       const chords = this.chords.map(e=>e.value);
       const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
 
       // Prime with root note of the first chord.
-      seq = {
-        quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
-        notes: [],
-        totalQuantizedSteps: 1
-      };
 
-      model.continueSequence(seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
+      model.continueSequence(this.seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
         .then((contSeq) => {
 
           // Add the continuation to the original.
@@ -58,7 +57,7 @@ class Improviser extends React.Component {
             note.quantizedStartStep += 1;
             note.quantizedEndStep += 1;
             note.instrument = 0;
-            seq.notes.push(note);
+            this.seq.notes.push(note);
           });
 
 
@@ -67,7 +66,7 @@ class Improviser extends React.Component {
             chords.forEach((chord, j)=>{
               // Add bass
               const root = mm.chords.ChordSymbols.root(chord);
-              seq.notes.push({
+              this.seq.notes.push({
                 instrument: 1,
                 program: 0,
                 pitch: 36 + root,
@@ -77,7 +76,7 @@ class Improviser extends React.Component {
 
               // Add Chords
               mm.chords.ChordSymbols.pitches(chord).forEach((pitch, k)=>{
-                seq.notes.push({
+                this.seq.notes.push({
                   instrument: 2,
                   program: 0,
                   pitch: 48 + pitch,
@@ -91,34 +90,35 @@ class Improviser extends React.Component {
           }
 
           // Set total sequence length.
-          seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
-          console.log(seq);
+          this.seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
+          console.log(this.seq);
 
         })
         console.log("done");
+        this.forceUpdate()
     }
 
     const playOnce = () => {
-      if(seq){
-        player.start(seq, 120).then(() => {
+      if(this.seq){
+        player.start(this.seq, 120).then(() => {
           playing = false;
         });
       }
     }
 
     const play = () => {
+
       playing = true;
-      console.log(currentChords);
       mm.Player.tone.context.resume();
       player.stop();
       playOnce();
     }
 
     const download = () => {
-      if (!seq) {
+      if (!this.seq) {
         alert('You must generate a trio before you can download it!');
       } else {
-        saveAs(new File([mm.sequenceProtoToMidi(seq)], 'seq.mid'));
+        saveAs(new File([mm.sequenceProtoToMidi(this.seq)], 'seq.mid'));
       }
     }
 
@@ -129,9 +129,11 @@ class Improviser extends React.Component {
                        <Async.Fulfilled>
                           <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
                        <br/>
-                       <input  type='button' value='Generate' onClick = {generate}/>
-                       <input  type='button' value='Play' onClick = {play}/>
-                       <input  type='button' value='Download' onClick = {download}/>
+                        <Button variant="outline-primary" onClick = {generate}>Generate</Button>
+                       {this.seq?(
+                         <Button variant="outline-primary" onClick = {play}>Play</Button>
+                       ):""
+                       }
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
                      </Async>
