@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { chords as mmChords } from '@magenta/music' ;
+import { extended } from "@tonaljs/chord";
 
 
 class ChordInput extends React.Component {
@@ -23,6 +24,7 @@ class ChordInput extends React.Component {
     const checkChord = () => {
       const input = ReactDOM.findDOMNode(this);
       const chord = input.value;
+      console.log(extended(chord))
 
       if (isGood(chord)) {
         input.style.color = 'black';

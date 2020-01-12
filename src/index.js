@@ -98,6 +98,7 @@ class Improviser extends React.Component {
 
         })
         console.log("done");
+        play()
     }
 
     const playOnce = () => {
@@ -125,17 +126,13 @@ class Improviser extends React.Component {
     }
 
 
-    return   <div className="container">Nuestros hermanos Estadounidenses, Alemanes y Taiwaneses nos han hecho entrar
-             en la era de la tecnología digital a tal punto que lo único que tenés que
-             hacer es poner el dedo y apretar un botón...
+    return   <div className="container">
                      <Async promiseFn={init_model} model={model}>
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
                           <Phrase id='chords' className="row" />
                        <br/>
-                       <input  type='button' value='Generate' onClick = {generate}/>
-                       <input  type='button' value='Play' onClick = {play}/>
-                       <input  type='button' value='Download' onClick = {download}/>
+                       <input  type='button' value='Generate & Play' onClick = {() => {generate(); play();}}/>
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
                      </Async>
