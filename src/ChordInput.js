@@ -18,7 +18,7 @@ class ChordInput extends React.Component {
     const handleChange = () =>{
       checkChord();
       var newChord = this.input.value
-      this.props.onChordChange(newChord);
+      this.props.onChordUpdate(newChord);
     }
 
     const checkChord = () => {

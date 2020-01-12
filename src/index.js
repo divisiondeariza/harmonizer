@@ -11,7 +11,7 @@ import Phrase from "./Phrase"
 class Improviser extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {chords: []};
+    this.chords = []
   }
 
   render(){
@@ -40,9 +40,7 @@ class Improviser extends React.Component {
     // Sample over chord progression.
     const generate = () => {
       console.log("generating");
-      currentChords = [...ReactDOM.findDOMNode(this).querySelector('#chords').querySelectorAll('.chord > input')].map(e=>e.value);
-      console.log(currentChords);
-      const chords = currentChords;
+      const chords = this.chords.map(e=>e.value);
       const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
 
       // Prime with root note of the first chord.
@@ -98,7 +96,6 @@ class Improviser extends React.Component {
 
         })
         console.log("done");
-        play()
     }
 
     const playOnce = () => {
@@ -130,9 +127,11 @@ class Improviser extends React.Component {
                      <Async promiseFn={init_model} model={model}>
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
-                          <Phrase id='chords' className="row" />
+                          <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
                        <br/>
-                       <input  type='button' value='Generate & Play' onClick = {() => {generate(); play();}}/>
+                       <input  type='button' value='Generate' onClick = {generate}/>
+                       <input  type='button' value='Play' onClick = {play}/>
+                       <input  type='button' value='Download' onClick = {download}/>
                        </Async.Fulfilled>
                        <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
                      </Async>

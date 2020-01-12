@@ -5,40 +5,44 @@ import Button from 'react-bootstrap/Button';
 class Phrase extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {chords: []};
+    this.chords = this.props.chords;
+    this.onChange = this.props.onChange;
   }
 
   render(){
+
+    const onChangeChords=()=>{
+      this.onChange(this.chords);
+      this.forceUpdate()
+    }
+
     const addChord = (index) => {
-      var chords = this.state.chords;
-      chords.splice(index, 0, {value: ""});
-      this.setState({chords: chords});
+      this.chords.splice(index, 0, {value: ""});
+      onChangeChords()
     }
 
     const removeChord = (index) => {
-      var chords = this.state.chords;
-      chords.splice(index, 1);
-      this.setState({chords: chords});
+      this.chords.splice(index, 1);
+      onChangeChords()
     }
 
-    const onChordChange = (newChord, index) => {
-      var chords = this.state.chords;
-      chords.splice(index, 1, {value: newChord});
-      this.setState({chords: chords});
+    const onChordUpdate = (newChord, index) => {
+      this.chords.splice(index, 1, {value: newChord});
+      onChangeChords()
     }
 
     const renderChords = () => {
-      return this.state.chords.map((chord, index) => {
+      return this.chords.map((chord, index) => {
         return <div key={index} className="col-1 chord">
-                  <ChordInput value={chord.value} onChordChange={(newChordValue)=>onChordChange(newChordValue, index)}/>
-                  <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}> -  </Button>
+                  <ChordInput value={chord.value} onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
+                  <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}>-</Button>
                   {renderAddButton(index + 1)}
                </div>
       })
     }
 
     const renderAddButton = (index) =>{
-        return <Button variant="outline-primary" size="sm" onClick={()=>{addChord(index)}}> + </Button>
+        return <Button variant="outline-success" size="sm" onClick={()=>{addChord(index)}}>+</Button>
     }
 
     return <div className="row" id={this.props.id}>
