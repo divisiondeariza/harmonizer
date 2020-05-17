@@ -18,14 +18,6 @@ class Improviser extends React.Component {
 
   render(){
 
-    // Number of steps to play each chord.
-    const STEPS_PER_QUARTER = 6;
-    const CHORDS_PER_BAR = 2;
-    const STEPS_PER_CHORD = STEPS_PER_QUARTER * 4 / CHORDS_PER_BAR;
-
-    // Number of times to repeat chord progression.
-    const NUM_REPS = 1;
-    //const model = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
     const model =  new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
     const init_model = async ({model}) => {
       return await model.initialize();
@@ -37,19 +29,21 @@ class Improviser extends React.Component {
 
 
     const getNoteSequence = ()=>{
-      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
-      for (let i = 0; i < 24; i++) {
-
-
-            sequence.notes.push(
-              { pitch: 81 - i%12,
-                instrument: "0",
-                quantizedStartStep: i,
-                quantizedEndStep: i
-              },
-            );
-          }
-          return sequence
+      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 3}};
+      var step = 0;
+          this.chords.forEach((chord, i)=>{
+            mm.chords.ChordSymbols.pitches(chord.value).forEach((pitch, j)=>{
+                sequence.notes.push(
+                  { pitch: pitch + 60,
+                    instrument: "1",
+                    quantizedStartStep: step,
+                    quantizedEndStep: step + 1
+                  }
+                );
+                step++;
+          });
+        });
+        return sequence
       }
 
 
@@ -58,14 +52,17 @@ class Improviser extends React.Component {
       console.log("generating");
 
       var seed = getNoteSequence();
-
       model.infill(seed, {
         temperature: 0.99,
       }).then((output) =>{
         // output.notes.forEach((note) => {
         //   note.instrument = note.instrument.toString();
         // });
-        this.seq = output;
+        this.seq = mm.sequences.mergeConsecutiveNotes(output);
+        console.log(this.seq)
+        this.forceUpdate();
+        console.log("done");
+
         //saveAs(new File([seqmidi], 'bach.mid'));
       })
 
@@ -124,13 +121,12 @@ class Improviser extends React.Component {
       //     console.log(this.seq);
       //
       //   })
-        console.log("done");
-        this.forceUpdate()
+
     }
 
     const playOnce = () => {
       if(this.seq){
-        player.start(this.seq, 120).then(() => {
+        player.start(this.seq, 90).then(() => {
           playing = false;
         });
       }

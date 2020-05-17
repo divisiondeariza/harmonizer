@@ -24,7 +24,6 @@ class ChordInput extends React.Component {
     const checkChord = () => {
       const input = ReactDOM.findDOMNode(this);
       const chord = input.value;
-      console.log(extended(chord))
 
       if (isGood(chord)) {
         input.style.color = 'black';
@@ -38,7 +37,7 @@ class ChordInput extends React.Component {
         return false;
       }
       try {
-        mmChords.ChordSymbols.pitches(chord);
+        mmChords.ChordSymbols.pitches(chord); // odd way of testing, should be improved
         return true;
       }
       catch(e) {
