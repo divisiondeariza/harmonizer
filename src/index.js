@@ -25,7 +25,8 @@ class Improviser extends React.Component {
 
     // Number of times to repeat chord progression.
     const NUM_REPS = 1;
-    const model = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
+    //const model = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
+    const model =  new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
     const init_model = async ({model}) => {
       return await model.initialize();
     }
@@ -35,65 +36,94 @@ class Improviser extends React.Component {
     var playing;
 
 
+    const getNoteSequence = ()=>{
+      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
+      for (let i = 0; i < 24; i++) {
+
+
+            sequence.notes.push(
+              { pitch: 81 - i%12,
+                instrument: "0",
+                quantizedStartStep: i,
+                quantizedEndStep: i
+              },
+            );
+          }
+          return sequence
+      }
+
 
     // Sample over chord progression.
     const generate = () => {
       console.log("generating");
-      this.seq = {
-                    quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
-                    notes: [],
-                    totalQuantizedSteps: 1
-                  };
-      const chords = this.chords.map(e=>e.value);
-      const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
 
-      // Prime with root note of the first chord.
+      var seed = getNoteSequence();
 
-      model.continueSequence(this.seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
-        .then((contSeq) => {
+      model.infill(seed, {
+        temperature: 0.99,
+      }).then((output) =>{
+        // output.notes.forEach((note) => {
+        //   note.instrument = note.instrument.toString();
+        // });
+        this.seq = output;
+        //saveAs(new File([seqmidi], 'bach.mid'));
+      })
 
-          // Add the continuation to the original.
-          contSeq.notes.forEach((note) => {
-            note.quantizedStartStep += 1;
-            note.quantizedEndStep += 1;
-            note.instrument = 0;
-            this.seq.notes.push(note);
-          });
-
-
-          for (var i=0; i<NUM_REPS; i++) {
-
-            chords.forEach((chord, j)=>{
-              // Add bass
-              const root = mm.chords.ChordSymbols.root(chord);
-              this.seq.notes.push({
-                instrument: 1,
-                program: 0,
-                pitch: 36 + root,
-                quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
-                quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
-              });
-
-              // Add Chords
-              mm.chords.ChordSymbols.pitches(chord).forEach((pitch, k)=>{
-                this.seq.notes.push({
-                  instrument: 2,
-                  program: 0,
-                  pitch: 48 + pitch,
-                  quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
-                  quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
-                });
-              })
-
-            })
-
-          }
-
-          // Set total sequence length.
-          this.seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
-          console.log(this.seq);
-
-        })
+      // this.seq = {
+      //               quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
+      //               notes: [],
+      //               totalQuantizedSteps: 1
+      //             };
+      // const chords = this.chords.map(e=>e.value);
+      // const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
+      //
+      // // Prime with root note of the first chord.
+      //
+      // model.continueSequence(this.seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
+      //   .then((contSeq) => {
+      //
+      //     // Add the continuation to the original.
+      //     contSeq.notes.forEach((note) => {
+      //       note.quantizedStartStep += 1;
+      //       note.quantizedEndStep += 1;
+      //       note.instrument = 0;
+      //       this.seq.notes.push(note);
+      //     });
+      //
+      //
+      //     for (var i=0; i<NUM_REPS; i++) {
+      //
+      //       chords.forEach((chord, j)=>{
+      //         // Add bass
+      //         const root = mm.chords.ChordSymbols.root(chord);
+      //         this.seq.notes.push({
+      //           instrument: 1,
+      //           program: 0,
+      //           pitch: 36 + root,
+      //           quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
+      //           quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
+      //         });
+      //
+      //         // Add Chords
+      //         mm.chords.ChordSymbols.pitches(chord).forEach((pitch, k)=>{
+      //           this.seq.notes.push({
+      //             instrument: 2,
+      //             program: 0,
+      //             pitch: 48 + pitch,
+      //             quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
+      //             quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
+      //           });
+      //         })
+      //
+      //       })
+      //
+      //     }
+      //
+      //     // Set total sequence length.
+      //     this.seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
+      //     console.log(this.seq);
+      //
+      //   })
         console.log("done");
         this.forceUpdate()
     }
@@ -131,7 +161,10 @@ class Improviser extends React.Component {
                        <br/>
                         <Button variant="outline-primary" onClick = {generate}>Generate</Button>
                        {this.seq?(
-                         <Button variant="outline-primary" onClick = {play}>Play</Button>
+                         <div>
+                          <Button variant="outline-primary" onClick = {play}>Play</Button>
+                          <Button variant="outline-primary" onClick = {download}>download</Button>
+                         </div>
                        ):""
                        }
                        </Async.Fulfilled>
