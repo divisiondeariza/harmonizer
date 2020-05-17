@@ -29,7 +29,7 @@ class Improviser extends React.Component {
 
 
     const getNoteSequence = ()=>{
-      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 3}};
+      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
       var step = 0;
           this.chords.forEach((chord, i)=>{
             mm.chords.ChordSymbols.pitches(chord.value).forEach((pitch, j)=>{
@@ -43,8 +43,29 @@ class Improviser extends React.Component {
                 step++;
           });
         });
-        return sequence
+        var sequences = this.chords.map((chord)=>generateArpeggio(chord.value));
+        return mm.sequences.concatenate(sequences);
       }
+
+    const generateArpeggio = (chord) => {
+      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
+      var step = 0;
+      var pitches = mm.chords.ChordSymbols.pitches(chord);
+      pitches.push(pitches[0] + 12)
+      var numNotes = 4;
+      for (var i = 0; i < numNotes; i++) {
+        sequence.notes.push(
+          { pitch: pitches[i%pitches.length] + 60,
+            instrument: "1",
+            quantizedStartStep: i,
+            quantizedEndStep: i + 1
+          }
+        );
+      }
+      //console.log(pitches.length)
+      sequence.totalQuantizedSteps = numNotes;
+      return sequence;
+    }
 
 
     // Sample over chord progression.
@@ -52,6 +73,7 @@ class Improviser extends React.Component {
       console.log("generating");
 
       var seed = getNoteSequence();
+      console.log(seed);
       model.infill(seed, {
         temperature: 0.99,
       }).then((output) =>{
@@ -65,62 +87,6 @@ class Improviser extends React.Component {
 
         //saveAs(new File([seqmidi], 'bach.mid'));
       })
-
-      // this.seq = {
-      //               quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER},
-      //               notes: [],
-      //               totalQuantizedSteps: 1
-      //             };
-      // const chords = this.chords.map(e=>e.value);
-      // const STEPS_PER_PROG = chords.length * STEPS_PER_CHORD;
-      //
-      // // Prime with root note of the first chord.
-      //
-      // model.continueSequence(this.seq, ( NUM_REPS * STEPS_PER_PROG ) - 1, 1, chords)
-      //   .then((contSeq) => {
-      //
-      //     // Add the continuation to the original.
-      //     contSeq.notes.forEach((note) => {
-      //       note.quantizedStartStep += 1;
-      //       note.quantizedEndStep += 1;
-      //       note.instrument = 0;
-      //       this.seq.notes.push(note);
-      //     });
-      //
-      //
-      //     for (var i=0; i<NUM_REPS; i++) {
-      //
-      //       chords.forEach((chord, j)=>{
-      //         // Add bass
-      //         const root = mm.chords.ChordSymbols.root(chord);
-      //         this.seq.notes.push({
-      //           instrument: 1,
-      //           program: 0,
-      //           pitch: 36 + root,
-      //           quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
-      //           quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
-      //         });
-      //
-      //         // Add Chords
-      //         mm.chords.ChordSymbols.pitches(chord).forEach((pitch, k)=>{
-      //           this.seq.notes.push({
-      //             instrument: 2,
-      //             program: 0,
-      //             pitch: 48 + pitch,
-      //             quantizedStartStep: i*STEPS_PER_PROG + j*STEPS_PER_CHORD,
-      //             quantizedEndStep: i*STEPS_PER_PROG + (j+1)*STEPS_PER_CHORD
-      //           });
-      //         })
-      //
-      //       })
-      //
-      //     }
-      //
-      //     // Set total sequence length.
-      //     this.seq.totalQuantizedSteps = STEPS_PER_PROG * NUM_REPS;
-      //     console.log(this.seq);
-      //
-      //   })
 
     }
 
