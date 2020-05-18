@@ -8,16 +8,15 @@ import Async from "react-async"
 import { saveAs } from 'file-saver';
 import Phrase from "./Phrase"
 import Button from 'react-bootstrap/Button';
+import generateArpeggio from './coconet-utils/arpeggios.js'
 
 class Improviser extends React.Component {
   constructor(props) {
     super(props);
     this.chords = [];
-
   }
 
   render(){
-
     const model =  new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
     const init_model = async ({model}) => {
       return await model.initialize();
@@ -29,30 +28,9 @@ class Improviser extends React.Component {
 
 
     const getNoteSequence = ()=>{
-        var step = 0;
         var sequences = this.chords.map((chord)=>generateArpeggio(chord.value));
         return mm.sequences.concatenate(sequences);
       }
-
-    const generateArpeggio = (chord) => {
-      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 2}};
-      var step = 0;
-      var pitches = mm.chords.ChordSymbols.pitches(chord);
-      var numNotes = 4;
-      for (var i = 0; i < numNotes; i++) {
-        sequence.notes.push(
-          { pitch: pitches[i%pitches.length] + 60,
-            instrument: "1",
-            quantizedStartStep: i,
-            quantizedEndStep: i + 1
-          }
-        );
-      }
-      //console.log(pitches.length)
-      sequence.totalQuantizedSteps = numNotes;
-      return sequence;
-    }
-
 
     // Sample over chord progression.
     const generate = () => {
@@ -77,7 +55,7 @@ class Improviser extends React.Component {
 
     const playOnce = () => {
       if(this.seq){
-        player.start(this.seq, 60).then(() => {
+        player.start(this.seq, 90).then(() => {
           playing = false;
         });
       }
