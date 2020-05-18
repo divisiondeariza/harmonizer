@@ -29,29 +29,15 @@ class Improviser extends React.Component {
 
 
     const getNoteSequence = ()=>{
-      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
-      var step = 0;
-          this.chords.forEach((chord, i)=>{
-            mm.chords.ChordSymbols.pitches(chord.value).forEach((pitch, j)=>{
-                sequence.notes.push(
-                  { pitch: pitch + 60,
-                    instrument: "1",
-                    quantizedStartStep: step,
-                    quantizedEndStep: step + 1
-                  }
-                );
-                step++;
-          });
-        });
+        var step = 0;
         var sequences = this.chords.map((chord)=>generateArpeggio(chord.value));
         return mm.sequences.concatenate(sequences);
       }
 
     const generateArpeggio = (chord) => {
-      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
+      var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 2}};
       var step = 0;
       var pitches = mm.chords.ChordSymbols.pitches(chord);
-      pitches.push(pitches[0] + 12)
       var numNotes = 4;
       for (var i = 0; i < numNotes; i++) {
         sequence.notes.push(
@@ -73,7 +59,6 @@ class Improviser extends React.Component {
       console.log("generating");
 
       var seed = getNoteSequence();
-      console.log(seed);
       model.infill(seed, {
         temperature: 0.99,
       }).then((output) =>{
@@ -92,7 +77,7 @@ class Improviser extends React.Component {
 
     const playOnce = () => {
       if(this.seq){
-        player.start(this.seq, 90).then(() => {
+        player.start(this.seq, 60).then(() => {
           playing = false;
         });
       }
