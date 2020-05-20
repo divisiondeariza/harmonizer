@@ -9,25 +9,7 @@ import { saveAs } from 'file-saver';
 import Phrase from "./Phrase"
 import Button from 'react-bootstrap/Button';
 import generateArpeggio from './coconet-utils/arpeggios.js'
-
-
-class HarmonizerModel{
-  constructor(){
-    console.log("brand new model!");
-    this.model = new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
-    this.init_promise = this.model.initialize();
-  }
-
-  async getModel(){
-    if(!this.model.isInitialized()){
-      console.log("initializing!");
-      await this.model.initialize();
-    }
-    return this.model
-  }
-}
-
-var harmonizerModel = new HarmonizerModel();
+import harmonizerModel from './coconet-utils/harmonizer-model.js'
 
 class Improviser extends React.Component {
   constructor(props) {

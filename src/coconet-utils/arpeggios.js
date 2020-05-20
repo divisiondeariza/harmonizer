@@ -1,8 +1,8 @@
-import * as mm from '@magenta/music';
+import { chords as mmChords } from '@magenta/music' ;
 
 const generateArpeggio = (chord) => {
   var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
-  var pitches = mm.chords.ChordSymbols.pitches(chord);
+  var pitches = mmChords.ChordSymbols.pitches(chord);
 
   // Black magic in order to keep arpegios simple and keep them inside the requirements for the model
   var scaledPitches = pitches.map( pitch => pitch + 60);
