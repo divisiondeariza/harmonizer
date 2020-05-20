@@ -8,13 +8,14 @@ import Async from "react-async"
 import { saveAs } from 'file-saver';
 import Phrase from "./Phrase"
 import Button from 'react-bootstrap/Button';
-import generateArpeggio from './coconet-utils/arpeggios.js'
+import Arpeggiator from './coconet-utils/arpeggios.js'
 import harmonizerModel from './coconet-utils/harmonizer-model.js'
 
 class Improviser extends React.Component {
   constructor(props) {
     super(props);
     this.chords = [];
+    this.arpegiator = new Arpeggiator();
   }
 
   render(){
@@ -27,7 +28,7 @@ class Improviser extends React.Component {
 
 
     const getNoteSequence = ()=>{
-        var sequences = this.chords.map((chord)=>generateArpeggio(chord.value));
+        var sequences = this.chords.map((chord)=>this.arpegiator.generateArpeggio(chord.value));
         return mm.sequences.concatenate(sequences);
       }
 
