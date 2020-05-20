@@ -1,6 +1,12 @@
 import { chords as mmChords } from '@magenta/music' ;
+import { sequences as mmSequences } from '@magenta/music' ;
 
 class Arpeggiator{
+
+  getNoteSequenceFromChords(chords){
+      var chordsSequences = chords.map((chord)=>this.generateArpeggio(chord));
+      return mmSequences.concatenate(chordsSequences);
+  }
 
   generateArpeggio(chord){
     var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};

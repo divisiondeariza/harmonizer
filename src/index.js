@@ -11,11 +11,13 @@ import Button from 'react-bootstrap/Button';
 import Arpeggiator from './coconet-utils/arpeggios.js'
 import harmonizerModel from './coconet-utils/harmonizer-model.js'
 
-class Improviser extends React.Component {
+
+class ArpeggioHarmonizer extends React.Component {
   constructor(props) {
     super(props);
     this.chords = [];
     this.arpegiator = new Arpeggiator();
+
   }
 
   render(){
@@ -25,16 +27,11 @@ class Improviser extends React.Component {
     const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
     const player = new mm.SoundFontPlayer(sfUrl);
 
-    const getNoteSequence = ()=>{
-        var sequences = this.chords.map((chord)=>this.arpegiator.generateArpeggio(chord.value));
-        return mm.sequences.concatenate(sequences);
-      }
-
     // Sample over chord progression.
     const generate = (model) => {
-      console.log("generating");
+      var seed = this.arpegiator.getNoteSequenceFromChords(this.chords.map(chord=>chord.value));
 
-      var seed = getNoteSequence();
+      console.log("generating");
       model.infill(seed, {
         temperature: 0.99,
       }).then((output) =>{
@@ -45,27 +42,13 @@ class Improviser extends React.Component {
 
     }
 
-    const playOnce = () => {
-      if(this.seq){
-        player.start(this.seq, 90).then(() => {
-        });
-      }
-    }
-
-    const play = () => {
-      mm.Player.tone.context.resume();
-      player.stop();
-      playOnce();
+    const play = (seq) => {
+      player.start(seq, 90);
     }
 
     const download = () => {
-      if (!this.seq) {
-        alert('You must generate a trio before you can download it!');
-      } else {
         saveAs(new File([mm.sequenceProtoToMidi(this.seq)], 'seq.mid'));
-      }
     }
-
 
     return   <div className="container">
                      <Async promiseFn={getModel}>
@@ -75,10 +58,15 @@ class Improviser extends React.Component {
                           <div>
                             <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
                             <br/>
-                            <Button variant="outline-primary" onClick = {() => generate(model)}>Generate</Button>
+
+                            {false?(
+                              <Button variant="outline-primary" > Generating </Button>):
+                              (<Button variant="outline-primary" onClick = {() => generate(model)}> Generate </Button>)
+                            }
+
                              {this.seq?(
                                <div>
-                                <Button variant="outline-primary" onClick = {play}>Play</Button>
+                                <Button variant="outline-primary" onClick = {()=>{ play(this.seq) } }>Play</Button>
                                 <Button variant="outline-primary" onClick = {download}>download</Button>
                                </div>
                              ):""}
@@ -91,7 +79,7 @@ class Improviser extends React.Component {
   }
 }
 
-ReactDOM.render(<Improviser />,
+ReactDOM.render(<ArpeggioHarmonizer />,
   document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
