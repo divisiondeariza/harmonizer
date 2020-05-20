@@ -24,8 +24,6 @@ class Improviser extends React.Component {
 
     const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
     const player = new mm.SoundFontPlayer(sfUrl);
-    var playing;
-
 
     const getNoteSequence = ()=>{
         var sequences = this.chords.map((chord)=>this.arpegiator.generateArpeggio(chord.value));
@@ -50,14 +48,11 @@ class Improviser extends React.Component {
     const playOnce = () => {
       if(this.seq){
         player.start(this.seq, 90).then(() => {
-          playing = false;
         });
       }
     }
 
     const play = () => {
-
-      playing = true;
       mm.Player.tone.context.resume();
       player.stop();
       playOnce();
@@ -95,8 +90,6 @@ class Improviser extends React.Component {
              </div>
   }
 }
-
-
 
 ReactDOM.render(<Improviser />,
   document.getElementById('root'));

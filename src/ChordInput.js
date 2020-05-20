@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { chords as mmChords } from '@magenta/music' ;
-import { extended } from "@tonaljs/chord";
-
 
 class ChordInput extends React.Component {
   constructor(props) {
