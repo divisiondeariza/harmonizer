@@ -10,6 +10,25 @@ import Phrase from "./Phrase"
 import Button from 'react-bootstrap/Button';
 import generateArpeggio from './coconet-utils/arpeggios.js'
 
+
+class HarmonizerModel{
+  constructor(){
+    console.log("brand new model!");
+    this.model = new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
+    this.init_promise = this.model.initialize();
+  }
+
+  async getModel(){
+    if(!this.model.isInitialized()){
+      console.log("initializing!");
+      await this.model.initialize();
+    }
+    return this.model
+  }
+}
+
+var harmonizerModel = new HarmonizerModel();
+
 class Improviser extends React.Component {
   constructor(props) {
     super(props);
@@ -17,10 +36,8 @@ class Improviser extends React.Component {
   }
 
   render(){
-    const model =  new mm.Coconet('https://storage.googleapis.com/magentadata/js/checkpoints/coconet/bach');
-    const init_model = async ({model}) => {
-      return await model.initialize();
-    }
+
+    const getModel = async() => harmonizerModel.getModel();
 
     const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
     const player = new mm.SoundFontPlayer(sfUrl);
@@ -33,22 +50,16 @@ class Improviser extends React.Component {
       }
 
     // Sample over chord progression.
-    const generate = () => {
+    const generate = (model) => {
       console.log("generating");
 
       var seed = getNoteSequence();
       model.infill(seed, {
         temperature: 0.99,
       }).then((output) =>{
-        // output.notes.forEach((note) => {
-        //   note.instrument = note.instrument.toString();
-        // });
         this.seq = mm.sequences.mergeConsecutiveNotes(output);
-        console.log(this.seq)
         this.forceUpdate();
         console.log("done");
-
-        //saveAs(new File([seqmidi], 'bach.mid'));
       })
 
     }
@@ -79,21 +90,24 @@ class Improviser extends React.Component {
 
 
     return   <div className="container">
-                     <Async promiseFn={init_model} model={model}>
+                     <Async promiseFn={getModel}>
                        <Async.Pending>Loading...</Async.Pending>
                        <Async.Fulfilled>
-                          <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
-                       <br/>
-                        <Button variant="outline-primary" onClick = {generate}>Generate</Button>
-                       {this.seq?(
-                         <div>
-                          <Button variant="outline-primary" onClick = {play}>Play</Button>
-                          <Button variant="outline-primary" onClick = {download}>download</Button>
-                         </div>
-                       ):""
-                       }
+                       { model => (
+                          <div>
+                            <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
+                            <br/>
+                            <Button variant="outline-primary" onClick = {() => generate(model)}>Generate</Button>
+                             {this.seq?(
+                               <div>
+                                <Button variant="outline-primary" onClick = {play}>Play</Button>
+                                <Button variant="outline-primary" onClick = {download}>download</Button>
+                               </div>
+                             ):""}
+                           </div>
+                          )}
                        </Async.Fulfilled>
-                       <Async.Rejected>{error => `Something went wrong: ${error.message}`}</Async.Rejected>
+                       <Async.Rejected>{error => `Something went wrong: ${error}`}</Async.Rejected>
                      </Async>
              </div>
   }
