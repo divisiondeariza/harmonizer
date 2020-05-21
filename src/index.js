@@ -24,7 +24,7 @@ class ArpeggioHarmonizer extends React.Component {
     const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
 
     const generate = (model) => {
-      var seed = this.arpegiator.getNoteSequenceFromChords(this.chords.map(chord=>chord.value));
+      var seed = this.arpegiator.getNoteSequenceFromChords(this.chords.map(chord=>chord));
 
       return model.infill(seed, {
                 temperature: 0.99,

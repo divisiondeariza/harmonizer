@@ -1,6 +1,8 @@
 import { chords as mmChords } from '@magenta/music' ;
 import { sequences as mmSequences } from '@magenta/music' ;
 
+const STEPS_PER_QUARTER = 4;
+
 class Arpeggiator{
 
   getNoteSequenceFromChords(chords){
@@ -9,8 +11,8 @@ class Arpeggiator{
   }
 
   generateArpeggio(chord){
-    var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: 4}};
-    var pitches = mmChords.ChordSymbols.pitches(chord);
+    var sequence = {notes:[], quantizationInfo: {stepsPerQuarter: STEPS_PER_QUARTER}};
+    var pitches = mmChords.ChordSymbols.pitches(chord.value);
 
     // Black magic in order to keep arpegios simple and keep them inside the requirements for the model
     var scaledPitches = pitches.map( pitch => pitch + 60);
@@ -23,7 +25,8 @@ class Arpeggiator{
 
     scaledPitches.sort();
 
-    var numNotes = 8;
+    var numNotes = STEPS_PER_QUARTER * chord.duration;
+    console.log(STEPS_PER_QUARTER);
     for (var i = 0; i < numNotes; i++) {
       sequence.notes.push(
         { pitch: scaledPitches[i%4],
