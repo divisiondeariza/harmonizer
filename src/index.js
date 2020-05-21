@@ -38,7 +38,7 @@ class ArpeggioHarmonizer extends React.Component {
                  <Async.Fulfilled>
                  { model => (
                     <div>
-                      <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
+                      <Phrase id='chords' className="row" onChange= {(chords)=>{this.chords=chords}}/>
                       <GeneratorButton promiseFn = {() => generate(model)} />
                       <PlayerComponent ref={ this.playerElement } soundfontUrl = {sfUrl} />
                      </div>

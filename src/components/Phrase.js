@@ -5,36 +5,35 @@ import Button from 'react-bootstrap/Button';
 class Phrase extends React.Component {
   constructor(props) {
     super(props);
-    this.chords = this.props.chords;
-    this.onChange = this.props.onChange;
-    this.chordsContainerRef = React.createRef();
+    this.state = { chords: [] }
+  }
+
+  componentDidUpdate(prevProps) {
+    this.props.onChange(this.state.chords);
   }
 
   render(){
 
-    const onChangeChords=()=>{
-      console.log(this.chordsContainerRef);
-      this.onChange(this.chords);
-      this.forceUpdate()
-    }
-
     const addChord = (index) => {
-      this.chords.splice(index, 0, {value: ""});
-      onChangeChords()
+      var chords = this.state.chords.slice();
+      chords.splice(index, 0, {value: ""})
+      this.setState({ chords: chords });
     }
 
     const removeChord = (index) => {
-      this.chords.splice(index, 1);
-      onChangeChords()
+      var chords = this.state.chords.slice();
+      chords.splice(index, 1);
+      this.setState({ chords: chords });
     }
 
     const onChordUpdate = (newChord, index) => {
-      this.chords.splice(index, 1, {value: newChord});
-      onChangeChords()
+      var chords = this.state.chords.slice();
+      chords.splice(index, 1, {value: newChord});
+      this.setState({ chords: chords });
     }
 
     const renderChords = () => {
-      return this.chords.map((chord, index) => {
+      return this.state.chords.map((chord, index) => {
         return <div key={index} className="col-1 chord">
                   <ChordInput value={chord.value} onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
                   <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}>-</Button>
@@ -50,10 +49,8 @@ class Phrase extends React.Component {
     return <div className="row" id={this.props.id}>
               <div className="col-1">
                   {renderAddButton(0)}
-                  <div ref={ this.chordsContainerRef } className="chords-container">
-                      {renderChords()}
-                  </div>
               </div>
+              {renderChords()}
            </div>
   }
 }
