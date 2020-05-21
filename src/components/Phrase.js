@@ -7,11 +7,13 @@ class Phrase extends React.Component {
     super(props);
     this.chords = this.props.chords;
     this.onChange = this.props.onChange;
+    this.chordsContainerRef = React.createRef();
   }
 
   render(){
 
     const onChangeChords=()=>{
+      console.log(this.chordsContainerRef);
       this.onChange(this.chords);
       this.forceUpdate()
     }
@@ -48,8 +50,10 @@ class Phrase extends React.Component {
     return <div className="row" id={this.props.id}>
               <div className="col-1">
                   {renderAddButton(0)}
+                  <div ref={ this.chordsContainerRef } className="chords-container">
+                      {renderChords()}
+                  </div>
               </div>
-              {renderChords()}
            </div>
   }
 }

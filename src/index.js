@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
-import Phrase from "./Phrase"
+import Phrase from "./components/Phrase"
 import Arpeggiator from './coconet-utils/arpeggios.js'
 import harmonizerModel from './coconet-utils/harmonizer-model'
 import GeneratorButton from './components/generator-button'
@@ -33,20 +33,19 @@ class ArpeggioHarmonizer extends React.Component {
               });
     }
     return   <div className="container">
-                     <Async promiseFn={getModel}>
-                       <Async.Pending>Loading...</Async.Pending>
-                       <Async.Fulfilled>
-                       { model => (
-                          <div>
-                            <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
-                            <br/>
-                            <GeneratorButton promiseFn = {() => generate(model)} />
-                            <PlayerComponent ref={ this.playerElement } soundfontUrl = {sfUrl} />
-                           </div>
-                          )}
-                       </Async.Fulfilled>
-                       <Async.Rejected>{error => `Something went wrong: ${error}`}</Async.Rejected>
-                     </Async>
+               <Async promiseFn={getModel}>
+                 <Async.Pending>Loading...</Async.Pending>
+                 <Async.Fulfilled>
+                 { model => (
+                    <div>
+                      <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
+                      <GeneratorButton promiseFn = {() => generate(model)} />
+                      <PlayerComponent ref={ this.playerElement } soundfontUrl = {sfUrl} />
+                     </div>
+                    )}
+                 </Async.Fulfilled>
+                 <Async.Rejected>{error => `Something went wrong: ${error}`}</Async.Rejected>
+               </Async>
              </div>
   }
 }
