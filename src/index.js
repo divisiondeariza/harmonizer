@@ -7,21 +7,87 @@ import * as serviceWorker from './serviceWorker';
 import Async from "react-async"
 import { saveAs } from 'file-saver';
 import Phrase from "./Phrase"
-import Button from 'react-bootstrap/Button';
+import { Button, Spinner } from 'react-bootstrap';
 import Arpeggiator from './coconet-utils/arpeggios.js'
 import harmonizerModel from './coconet-utils/harmonizer-model.js'
 
+
+class GenerateButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.promiseFn = props.promiseFn;
+    this.state = { isGenerating: false };
+    this.promise = null
+  }
+
+  render(){
+    const onClick = ()=>{
+      var promise = this.props.promiseFn().then(()=>{
+        this.setState({ isGenerating: false });
+      });
+      this.setState({ isGenerating: true });
+    };
+
+    return <div>
+              {this.state.isGenerating?(
+                <Button variant="outline-primary" disabled>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                <span>  </span>
+                Generating... </Button>):
+                (<Button variant="outline-primary" onClick = { onClick }> Generate </Button>)
+              }
+            </div>
+  }
+}
+
+class PlayerComponent extends React.Component {
+  constructor(props){
+    super(props);
+    this.player = new mm.SoundFontPlayer(props.soundfontUrl);
+    this.state = { sequence: null }
+  }
+
+  updateSequence(sequence){
+    this.setState({
+      sequence: sequence,
+    })
+  }
+
+  render(){
+    const play = () => {
+      this.player.start(this.state.sequence, 90);
+    }
+
+    const download = () => {
+        saveAs(new File([mm.sequenceProtoToMidi(this.state.sequence)], 'seq.mid'));
+    }
+
+    return (<div>
+              {this.state.sequence?(
+                <div>
+                 <Button variant="outline-primary" onClick = { play }>Play</Button>
+                 <Button variant="outline-primary" onClick = { download }>Download</Button>
+                </div>
+              ):""}
+           </div>)
+  }
+}
 
 class ArpeggioHarmonizer extends React.Component {
   constructor(props) {
     super(props);
     this.chords = [];
     this.arpegiator = new Arpeggiator();
-
+    this.playerElement = React.createRef();
   }
 
   render(){
-
     const getModel = async() => harmonizerModel.getModel();
 
     const sfUrl = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
@@ -32,14 +98,12 @@ class ArpeggioHarmonizer extends React.Component {
       var seed = this.arpegiator.getNoteSequenceFromChords(this.chords.map(chord=>chord.value));
 
       console.log("generating");
-      model.infill(seed, {
-        temperature: 0.99,
-      }).then((output) =>{
-        this.seq = mm.sequences.mergeConsecutiveNotes(output);
-        this.forceUpdate();
-        console.log("done");
-      })
-
+      return model.infill(seed, {
+                temperature: 0.99,
+              }).then((output) =>{
+                this.playerElement.current.updateSequence(mm.sequences.mergeConsecutiveNotes(output));
+                console.log("done");
+              });
     }
 
     const play = (seq) => {
@@ -58,18 +122,8 @@ class ArpeggioHarmonizer extends React.Component {
                           <div>
                             <Phrase id='chords' className="row" chords={this.chords} onChange= {(chords)=>{this.chords=chords}}/>
                             <br/>
-
-                            {false?(
-                              <Button variant="outline-primary" > Generating </Button>):
-                              (<Button variant="outline-primary" onClick = {() => generate(model)}> Generate </Button>)
-                            }
-
-                             {this.seq?(
-                               <div>
-                                <Button variant="outline-primary" onClick = {()=>{ play(this.seq) } }>Play</Button>
-                                <Button variant="outline-primary" onClick = {download}>download</Button>
-                               </div>
-                             ):""}
+                            <GenerateButton promiseFn = {() => generate(model)} />
+                            <PlayerComponent ref={ this.playerElement } soundfontUrl = {sfUrl} />
                            </div>
                           )}
                        </Async.Fulfilled>
