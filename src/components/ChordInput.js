@@ -3,10 +3,6 @@ import ReactDOM from 'react-dom';
 import { chords as mmChords } from '@magenta/music' ;
 
 class ChordInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {value: props.value};
-  }
 
   shouldComponentUpdate(nextProps) {
     return (this.props.value !== nextProps.value);

@@ -6,16 +6,15 @@ class GeneratorButton extends React.Component {
     super(props);
     this.promiseFn = props.promiseFn;
     this.state = { isGenerating: false };
-    this.promise = null
   }
 
   render(){
     const onClick = ()=>{
-      var promise = this.props.promiseFn().then(()=>{
+      this.props.promiseFn().then(()=>{
         this.setState({ isGenerating: false });
       });
-      this.setState({ isGenerating: true });
-    };
+        this.setState({ isGenerating: true });
+      };
 
     return <div>
               {this.state.isGenerating?(

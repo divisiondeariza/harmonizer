@@ -28,7 +28,7 @@ class Phrase extends React.Component {
 
     const onChordUpdate = (newChord, index) => {
       var chords = this.state.chords.slice();
-      chords.splice(index, 1, {value: newChord});
+      chords.splice(index, 1, { value: newChord });
       this.setState({ chords: chords });
     }
 
