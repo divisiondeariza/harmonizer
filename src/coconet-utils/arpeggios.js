@@ -26,7 +26,6 @@ class Arpeggiator{
     scaledPitches.sort();
 
     var numNotes = STEPS_PER_QUARTER * chord.duration;
-    console.log(STEPS_PER_QUARTER);
     for (var i = 0; i < numNotes; i++) {
       sequence.notes.push(
         { pitch: scaledPitches[i%4],

@@ -34,7 +34,7 @@ class Phrase extends React.Component {
 
     const renderChords = () => {
       return this.state.chords.map((chord, index) => {
-        return <div key={index} className="col-1 chord">
+        return <div key={index} className="col-3 chord">
                   <ChordInput value={chord.value} onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
                   <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}>-</Button>
                   {renderAddButton(index + 1)}
@@ -46,11 +46,15 @@ class Phrase extends React.Component {
         return <Button variant="outline-success" size="sm" onClick={()=>{addChord(index)}}>+</Button>
     }
 
-    return <div className="row" id={this.props.id}>
+    return <div className="row">
               <div className="col-1">
                   {renderAddButton(0)}
               </div>
-              {renderChords()}
+              <div className="col-11">
+                <div className="row">
+                  {renderChords()}
+                </div>
+              </div>
            </div>
   }
 }
