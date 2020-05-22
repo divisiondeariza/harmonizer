@@ -1,5 +1,6 @@
 import React from 'react';
 import { chords as mmChords } from '@magenta/music' ;
+import "./chord-input.css"
 
 class ChordInput extends React.Component {
 
