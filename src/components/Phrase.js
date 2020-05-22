@@ -16,7 +16,7 @@ class Phrase extends React.Component {
 
     const addChord = (index) => {
       var chords = this.state.chords.slice();
-      chords.splice(index, 0, {value: ""})
+      chords.splice(index, 0, { value: "", duration: 1 })
       this.setState({ chords: chords });
     }
 
@@ -35,7 +35,7 @@ class Phrase extends React.Component {
     const renderChords = () => {
       return this.state.chords.map((chord, index) => {
         return <div key={index} className="col-3 chord">
-                  <ChordInput value={chord.value} onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
+                  <ChordInput value={ chord.value } duration={ chord.duration } onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
                   <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}>-</Button>
                   {renderAddButton(index + 1)}
                </div>

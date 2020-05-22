@@ -46,6 +46,7 @@ class ChordInput extends React.Component {
                    onChange = {handleChange}/>
               <input ref={ this.durationRef }
                    type='number'
+                   value={this.props.duration}
                    onChange = {handleChange}/>
             </div>
   }
