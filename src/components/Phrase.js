@@ -1,6 +1,7 @@
 import React from 'react';
 import ChordInput from "./ChordInput"
 import Button from 'react-bootstrap/Button';
+import "./phrase.css"
 
 class Phrase extends React.Component {
   constructor(props) {
@@ -34,13 +35,13 @@ class Phrase extends React.Component {
 
     const renderChords = () => {
       return this.state.chords.map((chord, index) => {
-        return <div key={index} className="col-3 chord">
+        return <div key={index} className="chord" style={ { width: `${chord.duration * 25 }` + "%" } }>
                   <div className="row">
                     <div className="col-10">
                       <ChordInput value={ chord.value } duration={ chord.duration } onChordUpdate={(newChordValue)=>onChordUpdate(newChordValue, index)}/>
                       <Button variant="outline-danger" size="sm" onClick={()=>{removeChord(index)}}>-</Button>
                     </div>
-                    <div className="col-2">                    
+                    <div className="col-2">
                       {renderAddButton(index + 1)}
                     </div>
                   </div>
