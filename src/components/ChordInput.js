@@ -44,7 +44,8 @@ class ChordInput extends React.Component {
               <input ref={ this.valueRef }
                    type='text'
                    value={this.props.value}
-                   onChange = {handleChange}/>
+                   onChange = {handleChange}
+                   tabindex="1"/>
               <input ref={ this.durationRef }
                    type='number'
                    value={this.props.duration}
