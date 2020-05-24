@@ -1,3 +1,15 @@
 input{
-  width: 50%;
+  width: fill;
+}
+
+.chord-name{
+  font-size: 24px;
+}
+
+.correct{
+  color: black;
+}
+
+.incorrect{
+  color: red;
 }

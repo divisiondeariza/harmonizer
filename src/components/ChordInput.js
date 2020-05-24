@@ -6,25 +6,20 @@ class ChordInput extends React.Component {
 
   constructor(props){
     super(props);
-    this.valueRef = React.createRef();
-    this.durationRef = React.createRef();
+    this.value = this.props.value;
+    this.duration = this.props.duration;
   }
 
   render(){
-    const handleChange = (event) =>{
-      check();
-      this.props.onChordUpdate({ value: this.valueRef.current.value, duration: this.durationRef.current.value });
+
+    const updateDuration = (duration)=>{
+      this.duration = duration;
+      this.props.onChordUpdate({ value: this.value, duration: this.duration });
     }
 
-    const check = () => {
-      const input = this.valueRef.current;
-      const chord = input.value;
-
-      if (isGood(chord)) {
-        input.style.color = 'black';
-      } else {
-        input.style.color = 'red';
-      }
+    const updateValue = (value)=>{
+      this.value = value;
+      this.props.onChordUpdate({ value: this.value, duration: this.duration });
     }
 
     const isGood = (chord) => {
@@ -41,15 +36,14 @@ class ChordInput extends React.Component {
     }
 
     return  <div>
-              <input ref={ this.valueRef }
-                   type='text'
-                   value={this.props.value}
-                   onChange = {handleChange}
-                   tabindex="1"/>
-              <input ref={ this.durationRef }
-                   type='number'
-                   value={this.props.duration}
-                   onChange = {handleChange}/>
+              <input type='text'
+                     value={this.value}
+                     className={ isGood(this.props.value)?"correct":"incorrect"  }
+                     onChange = { event => updateValue(event.target.value) }
+                     tabIndex="1"/>
+              <input type='number'
+                     value={this.duration}
+                     onChange = { event => updateDuration(event.target.value) }/>
             </div>
   }
 }
