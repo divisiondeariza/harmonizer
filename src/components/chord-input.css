@@ -1,5 +1,6 @@
 input{
-  width: fill;
+  /* width: fill; */
+  width: 50%;
 }
 
 .chord-name{

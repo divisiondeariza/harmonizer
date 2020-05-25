@@ -12,6 +12,9 @@ class ChordInput extends React.Component {
 
   render(){
 
+    this.value = this.props.value;
+    this.duration = this.props.duration;
+
     const updateDuration = (duration)=>{
       this.duration = duration;
       this.props.onChordUpdate({ value: this.value, duration: this.duration });
