@@ -39,6 +39,9 @@ class ChordInput extends React.Component {
     }
 
     return  <div>
+              <div className="lenght-measure">
+                  { this.duration }
+              </div>
               <input type='text'
                      value={this.value}
                      className={ isGood(this.props.value)?"correct":"incorrect"  }
